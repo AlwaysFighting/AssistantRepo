@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thread_project/home/screen/add_item.dart';
 
 class DefaultLayout extends StatelessWidget {
   final String title;
@@ -18,6 +17,7 @@ class DefaultLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: floatingActionButton,
       appBar: AppBar(
         centerTitle: true,
         title: Text(title),

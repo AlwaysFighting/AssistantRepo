@@ -32,7 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.of(context).push(
               MaterialPageRoute(builder: (BuildContext context) {
-                return AddItemScreen();
+                return AddItemScreen(
+                  IDNumber: dropdownValue.toString(),
+                );
               }));
         },
         backgroundColor: Colors.teal,

@@ -1,18 +1,6 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../layout/default_layout.dart';
-import 'add_item.dart';
-
-const List<String> dataItemList = <String>[
-  "Item1",
-  "Item2",
-  "Item3",
-  "Item4",
-  "Item5",
-  "Item6",
-  "Item7",
-  "Item8",
-  "Item9",
-];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,15 +10,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String dropdownValue = dataItemList.first;
   String input = "";
   List dataItems = [];
+
+  late DatabaseReference dbRef;
 
   @override
   void initState() {
     super.initState();
-    dataItems.add("Item1");
-    dataItems.add("Item2");
+    // dbRef = FirebaseDatabase.instance.ref().child("Employee");
+    dataItems.add("value");
+    dataItems.add("value2");
   }
 
   @override
@@ -98,8 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: <Widget>[
                         Expanded(child: Text(dataItems[index])),
                         Expanded(
-                          child: TextField(
-
+                          child: TextFormField(
+                            initialValue: dataItems[index],
                           ),
                         ),
                         Expanded(
@@ -122,37 +112,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget DropDownContainer() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 30.0),
-      child: DropdownButton<String>(
-        value: dropdownValue,
-        hint: Text("Select Item"),
-        icon: Icon(Icons.arrow_drop_down),
-        alignment: Alignment.center,
-        isExpanded: true,
-        menuMaxHeight: 500.0,
-        underline: Container(
-          height: 1,
-          color: Colors.grey,
-        ),
-        iconSize: 25,
-        onChanged: (String? value) {
-          // This is called when the user selects an item.
-          setState(() {
-            dropdownValue = value!;
-          });
-        },
-        items: dataItemList.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-      ),
-    );
-  }
+
+
 }
+
 
 class SaveButton extends StatelessWidget {
   const SaveButton({Key? key}) : super(key: key);

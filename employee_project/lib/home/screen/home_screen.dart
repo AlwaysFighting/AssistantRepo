@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../layout/default_layout.dart';
+import '../../utils/data_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,26 +12,40 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String input = "";
-  List dataItems = [];
+  List<String> dataItems = [];
 
-  late DatabaseReference dbRef;
+  final database = FirebaseDatabase.instance.reference();
+  DateTime currentDate = DateTime.now().toUtc();
 
   @override
   void initState() {
     super.initState();
-    // dbRef = FirebaseDatabase.instance.ref().child("Employee");
+
     dataItems.add("value");
     dataItems.add("value2");
   }
 
   @override
   Widget build(BuildContext context) {
+    final dailySpecialRef = database.child(
+        '/${currentDate.year}년-${currentDate.month}월-${currentDate.day}일/item1');
+
     return DefaultLayout(
       actions: [
         SizedBox(
           child: IconButton(
-            onPressed: () {
-              print("SAVE Click");
+            onPressed: () async {
+              try {
+                await dailySpecialRef.set({
+                  'List1': 'gel',
+                  'value': 5,
+                  'TimeStamp': '${DataUtils.getTimeFormat(
+                      currentDate.hour)}시-${DataUtils.getTimeFormat(
+                      currentDate.minute)}분',
+                }).then((_) => print("UPLOAD SUCCESS"));
+              } catch (e) {
+                print("You get error $e");
+              }
             },
             icon: const Text(
               "SAVE",
@@ -111,9 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
-
 }
 
 
@@ -125,7 +137,9 @@ class SaveButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 40.0),
       child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+
+          },
           child: ButtonTheme(
             minWidth: MediaQuery.of(context).size.width,
             height: 300.0,

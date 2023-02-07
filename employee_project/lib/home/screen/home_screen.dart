@@ -94,6 +94,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final dailyDataRef = database.child(
         '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
 
+    void _setData(Map map) async {
+      for(int i = 0; i < dataKeyValues.length; i++){
+        print('dataKeyValues.length ${dataKeyValues.length}');
+        try {
+          await dailyDataRef.set({
+            '${map.keys.first}': '${map.keys.last}',
+          }).then((_) => print("UPLOAD SUCCESS"));
+        } catch (e) {
+          print("You get error $e");
+        }
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -102,14 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
             child: IconButton(
               onPressed: () async {
-                try {
-                  await dailyDataRef.set({
-                    'List1': 'gel',
-                    'value': 10,
-                  }).then((_) => print("UPLOAD SUCCESS"));
-                } catch (e) {
-                  print("You get error $e");
-                }
+                _setData(dataKeyValues);
               },
               icon: const Text(
                 "SAVE",
@@ -136,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextButton(
                     onPressed: () {
                       setState(() {
-
+                        dataKeyValues.addEntries({"$input": "0"}.entries);
                       });
                       Navigator.of(context).pop();
                     },
@@ -192,4 +198,5 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     );
   }
+
 }

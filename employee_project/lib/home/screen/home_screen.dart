@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../component/drawer_screen.dart';
@@ -22,23 +25,44 @@ class _HomeScreenState extends State<HomeScreen> {
   String dataListName = operationNameLists[0];
 
   final database = FirebaseDatabase.instance.reference();
-  DateTime currentDate = DateTime.now().toUtc();
+  DateTime now = DateTime.now().toUtc();
+
+  late StreamSubscription _dailySpecialStream;
 
   @override
   void initState() {
     super.initState();
+    _activateLister();
 
     dataItems.add("value");
     dataItems.add("value2");
   }
 
+  void _activateLister() {
+    _dailySpecialStream = database
+        .child('${now.year}년-${now.month}월-${now.day}일/$dataListName/')
+        .onValue
+        .listen((event) {
+      // final Object? description = event.snapshot.value;
+      final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
+
+      setState(() {
+        print(description);
+      });
+    });
+  }
+
+  @override
+  void deactivate() {
+    _dailySpecialStream.cancel();
+    super.deactivate();
+  }
+
   @override
   Widget build(BuildContext context) {
     final dailyDataRef = database.child(
-        '/${currentDate.year}년-${currentDate.month}월-${currentDate.day}일/$dataListName/${'${DataUtils.getTimeFormat(
-            DateTime.now().hour)}시-${DataUtils.getTimeFormat(
-            DateTime.now().minute)}분'}');
-    
+        '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -116,14 +140,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             initialValue: dataItems[index],
                           ),
                         ),
-                        Expanded(
-                          child: IconButton(
-                            onPressed: () {
-
-                            },
-                            icon: Icon(Icons.delete_outlined),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -135,10 +151,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ), drawer:  DrawerScreen(
       onRegionTap: (String region) {
         setState(() {
-          this.dataListName = region;
-        });
-        Navigator.of(context).pop();
-      },
+            this.dataListName = region;
+            _activateLister();
+          });
+          Navigator.of(context).pop();
+        },
       selectedRegion: dataListName,
     ),
     );

@@ -1,5 +1,5 @@
 const operationNameLists = [
-  '서울',
+  'Operation1',
   '경기',
   '대구',
   '인천',

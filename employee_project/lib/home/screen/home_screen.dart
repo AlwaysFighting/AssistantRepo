@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../component/drawer_screen.dart';
@@ -21,8 +20,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String input = "";
-  List<String> dataItems = [];
+
   String dataListName = operationNameLists[0];
+  int valueCount = 0;
+
+  Map<String, String> dataKeyValues = {};
 
   final database = FirebaseDatabase.instance.reference();
   DateTime now = DateTime.now().toUtc();
@@ -32,24 +34,53 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _activateLister();
-
-    dataItems.add("value");
-    dataItems.add("value2");
+    _activateListener();
   }
 
-  void _activateLister() {
+  void getKeysFromMap(Map map) {
+    map.keys.forEach((key) {
+      print(key);
+    });
+  }
+
+  void getValuesFromMap(Map map) {
+    map.values.forEach((value) {
+      print(value);
+    });
+  }
+
+  void getKeysAndValuesUsingForEach(Map map) {
+    map.forEach((key, value) {
+      for (int i = 0; i < valueCount; i++) {
+        dataKeyValues.addEntries({"$key": "$value"}.entries);
+      }
+      print(dataKeyValues);
+    });
+  }
+
+  void _activateListener() {
     _dailySpecialStream = database
         .child('${now.year}년-${now.month}월-${now.day}일/$dataListName/')
-        .onValue
+        .onChildAdded
         .listen((event) {
       // final Object? description = event.snapshot.value;
-      final data = Map<String, dynamic>.from(event.snapshot.value as dynamic);
-
+      final dataMap =
+          Map<dynamic, dynamic>.from(event.snapshot.value as dynamic);
       setState(() {
-        print(description);
+        valueCount = dataMap.length;
+        getKeysAndValuesUsingForEach(dataMap);
+        print("valueCount : $valueCount");
       });
     });
+  }
+
+  // 값 추가하기
+  void _activateUpdate(String key) {
+    database
+        .child(
+            '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}')
+        .push()
+        .set(key);
   }
 
   @override
@@ -74,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 try {
                   await dailyDataRef.set({
                     'List1': 'gel',
-                    'value': 5,
+                    'value': 10,
                   }).then((_) => print("UPLOAD SUCCESS"));
                 } catch (e) {
                   print("You get error $e");
@@ -95,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("기능 추가하기"),
+                title: Text("Add Function"),
                 content: TextField(
                   onChanged: (String value) {
                     input = value;
@@ -105,11 +136,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextButton(
                     onPressed: () {
                       setState(() {
-                        dataItems.add(input);
+
                       });
                       Navigator.of(context).pop();
                     },
-                    child: Text("추가하기"),
+                    child: Text("ADD"),
                   )
                 ],
               );
@@ -122,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(10, 50, 10, 20),
         child: ListView.builder(
-          itemCount: dataItems.length,
+          itemCount: dataKeyValues.length,
           padding: const EdgeInsets.all(8),
           itemBuilder: (BuildContext context, int index) {
             return Card(
@@ -134,10 +165,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Expanded(child: Text(dataItems[index])),
+                        Expanded(child: Text( "keyItems[]" + "$index")),
                         Expanded(
                           child: TextFormField(
-                            initialValue: dataItems[index],
+                            initialValue: "",
                           ),
                         ),
                       ],
@@ -152,7 +183,8 @@ class _HomeScreenState extends State<HomeScreen> {
       onRegionTap: (String region) {
         setState(() {
             this.dataListName = region;
-            _activateLister();
+            dataKeyValues = {}; // 저장 배열 공간 초기화
+            _activateListener();
           });
           Navigator.of(context).pop();
         },

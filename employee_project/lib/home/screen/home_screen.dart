@@ -22,6 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String inputKey = "";
   String inputValue = "";
 
+  List<String> keysList = [];
+  List<String> valuesList = [];
+
+  Map<int, String> listDataKey = {};
+  Map<int, String> listDataValue = {};
+
   Map<dynamic, dynamic> dataKeyValues = {};
 
   String dataListName = operationNameLists[0];
@@ -39,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void getKeysFromMap(Map map) {
-    map.keys.forEach((key) {
-      print(key);
+    map.forEach((key, value) {
+      for (int i = 0; i < valueCount; i++) {}
     });
   }
 
@@ -52,10 +58,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void getKeysAndValuesUsingForEach(Map map) {
     map.forEach((key, value) {
-      for (int i = 0; i < valueCount; i++) {
+      for (int i = 0; i < map.length; i++) {
         dataKeyValues.addEntries({"$key": "$value"}.entries);
+        keysList.add("$key");
+        valuesList.add("$value");
       }
     });
+
+    listDataKey = keysList.asMap();
+    listDataValue = valuesList.asMap();
   }
 
   void _activateListener() {
@@ -68,8 +79,14 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         valueCount = dataMap.length;
         getKeysAndValuesUsingForEach(dataMap);
+        print(dataMap);
       });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -79,9 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showSnackBar() {
-    final snackBar = SnackBar(content: Text(
-        "SUCCESS UPLOAD! 🥳",
-        style: TextStyle(
+    final snackBar = SnackBar(
+        content: Text(
+      "SUCCESS UPLOAD! 🥳",
+      style: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600
         ),
@@ -89,15 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+
   @override
   Widget build(BuildContext context) {
+
+
     final dailyDataRef = database.child(
-        '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils
-            .getTimeFormat(DateTime
-            .now()
-            .hour)}시-${DataUtils.getTimeFormat(DateTime
-            .now()
-            .minute)}분'}');
+        '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
 
     // 데이터 업데이트하기
     void _setData(Map map) {
@@ -107,14 +123,14 @@ class _HomeScreenState extends State<HomeScreen> {
           try {
             await dailyDataRef.update({
               '$key': '$value',
-            }
-            );
+            });
           } catch (e) {
             print("You get error $e");
           }
         }
       });
       _showSnackBar();
+      _activateListener();
     }
 
     return Scaffold(
@@ -138,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          // print(keysList);
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -150,9 +167,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(height: 17),
                       TextField(
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Enter a Operation Name',
-                        ),
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter a Operation Name',
+                            hintStyle:
+                                TextStyle(fontSize: 15.0, color: Colors.grey[10]),
+                            labelStyle: TextStyle(color: Colors.black54)),
                         onChanged: (String key) {
                           inputKey = key;
                         },
@@ -162,6 +181,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           hintText: 'Enter a Operation Values',
+                            hintStyle:
+                            TextStyle(fontSize: 15.0, color: Colors.grey[10]),
+                            labelStyle: TextStyle(color: Colors.black54),
                         ),
                         onChanged: (String value) {
                           inputValue = value;
@@ -176,6 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         dataKeyValues
                             .addEntries({"$inputKey": "$inputValue"}.entries);
+                        getKeysAndValuesUsingForEach(dataKeyValues);
+                        print(dataKeyValues);
                       });
                       Navigator.of(context).pop();
                     },
@@ -204,10 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Expanded(child: Text("${""}")),
+                        Expanded(child: Text("${listDataKey[index]}")),
                         Expanded(
                           child: TextFormField(
-                            initialValue: "${""}",
+                            initialValue: "${listDataValue[index]}",
                           ),
                         ),
                       ],

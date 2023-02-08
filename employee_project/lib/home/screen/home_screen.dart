@@ -19,12 +19,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String input = "";
+  String inputKey = "";
+  String inputValue = "";
+
+  Map<dynamic, dynamic> dataKeyValues = {};
 
   String dataListName = operationNameLists[0];
   int valueCount = 0;
-
-  Map<String, String> dataKeyValues = {};
 
   final database = FirebaseDatabase.instance.reference();
   DateTime now = DateTime.now().toUtc();
@@ -54,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
       for (int i = 0; i < valueCount; i++) {
         dataKeyValues.addEntries({"$key": "$value"}.entries);
       }
-      print(dataKeyValues);
     });
   }
 
@@ -63,24 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
         .child('${now.year}년-${now.month}월-${now.day}일/$dataListName/')
         .onChildAdded
         .listen((event) {
-      // final Object? description = event.snapshot.value;
       final dataMap =
           Map<dynamic, dynamic>.from(event.snapshot.value as dynamic);
       setState(() {
         valueCount = dataMap.length;
         getKeysAndValuesUsingForEach(dataMap);
-        print("valueCount : $valueCount");
       });
     });
-  }
-
-  // 값 추가하기
-  void _activateUpdate(String key) {
-    database
-        .child(
-            '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}')
-        .push()
-        .set(key);
   }
 
   @override
@@ -89,22 +78,43 @@ class _HomeScreenState extends State<HomeScreen> {
     super.deactivate();
   }
 
+  void _showSnackBar() {
+    final snackBar = SnackBar(content: Text(
+        "SUCCESS UPLOAD! 🥳",
+        style: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600
+        ),
+    ));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final dailyDataRef = database.child(
-        '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
+        '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils
+            .getTimeFormat(DateTime
+            .now()
+            .hour)}시-${DataUtils.getTimeFormat(DateTime
+            .now()
+            .minute)}분'}');
 
-    void _setData(Map map) async {
-      for(int i = 0; i < dataKeyValues.length; i++){
-        print('dataKeyValues.length ${dataKeyValues.length}');
-        try {
-          await dailyDataRef.set({
-            '${map.keys.first}': '${map.keys.last}',
-          }).then((_) => print("UPLOAD SUCCESS"));
-        } catch (e) {
-          print("You get error $e");
+    // 데이터 업데이트하기
+    void _setData(Map map) {
+      print(map);
+      map.forEach((key, value) async {
+        for (int i = 0; i < map.length; i++) {
+          try {
+            await dailyDataRef.update({
+              '$key': '$value',
+            }
+            );
+          } catch (e) {
+            print("You get error $e");
+          }
         }
-      }
+      });
+      _showSnackBar();
     }
 
     return Scaffold(
@@ -133,16 +143,39 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text("Add Function"),
-                content: TextField(
-                  onChanged: (String value) {
-                    input = value;
-                  },
+                content: Container(
+                  height: 150,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 17),
+                      TextField(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter a Operation Name',
+                        ),
+                        onChanged: (String key) {
+                          inputKey = key;
+                        },
+                      ),
+                      SizedBox(height: 5),
+                      TextField(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter a Operation Values',
+                        ),
+                        onChanged: (String value) {
+                          inputValue = value;
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
                       setState(() {
-                        dataKeyValues.addEntries({"$input": "0"}.entries);
+                        dataKeyValues
+                            .addEntries({"$inputKey": "$inputValue"}.entries);
                       });
                       Navigator.of(context).pop();
                     },
@@ -171,10 +204,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Expanded(child: Text( "keyItems[]" + "$index")),
+                        Expanded(child: Text("${""}")),
                         Expanded(
                           child: TextFormField(
-                            initialValue: "",
+                            initialValue: "${""}",
                           ),
                         ),
                       ],
@@ -188,15 +221,46 @@ class _HomeScreenState extends State<HomeScreen> {
       ), drawer:  DrawerScreen(
       onRegionTap: (String region) {
         setState(() {
-            this.dataListName = region;
-            dataKeyValues = {}; // 저장 배열 공간 초기화
-            _activateListener();
-          });
-          Navigator.of(context).pop();
-        },
+          dataListName = region;
+          dataKeyValues.clear(); // 저장 배열 공간 초기화
+          _activateListener();
+        });
+        Navigator.of(context).pop();
+      },
       selectedRegion: dataListName,
     ),
     );
   }
+}
 
+Container buildButton(BuildContext context, String text) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Theme
+          .of(context)
+          .primaryColor,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.4),
+          spreadRadius: 6,
+          blurRadius: 10,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ),
+  );
 }

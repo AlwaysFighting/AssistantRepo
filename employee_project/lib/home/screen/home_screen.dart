@@ -56,17 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // 맵의 key, value 불러오기
   void getKeysAndValuesUsingForEach(Map map) {
     map.forEach((key, value) {
       for (int i = 0; i < map.length; i++) {
         dataKeyValues.addEntries({"$key": "$value"}.entries);
-        keysList.add("$key");
-        valuesList.add("$value");
       }
     });
-
-    listDataKey = keysList.asMap();
-    listDataValue = valuesList.asMap();
   }
 
   void _activateListener() {
@@ -95,10 +91,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.deactivate();
   }
 
+  // 데이터 업데이트 성공시 스낵바 띄우기
   void _showSnackBar() {
     final snackBar = SnackBar(
         content: Text(
-      "SUCCESS UPLOAD! 🥳",
+      " 🎉 SUCCESS UPLOAD! 🎉",
       style: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600
@@ -107,10 +104,21 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  // 데이터 업데이트 실패시 스낵바 띄우기
+  void _errorShowSnackBar(Object error) {
+    final snackBar = SnackBar(
+        content: Text(
+          " 😵 $error 😵",
+          style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600
+          ),
+        ));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
-
 
     final dailyDataRef = database.child(
         '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
@@ -125,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
               '$key': '$value',
             });
           } catch (e) {
-            print("You get error $e");
+            _errorShowSnackBar(e);
           }
         }
       });
@@ -159,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("Add Function"),
+                title: Text("기능 추가하기"),
                 content: Container(
                   height: 150,
                   child: Column(
@@ -168,9 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Enter a Operation Name',
+                            hintText: 'Enter Name',
                             hintStyle:
-                                TextStyle(fontSize: 15.0, color: Colors.grey[10]),
+                                TextStyle(fontSize: 13.0, color: Colors.grey[10]),
                             labelStyle: TextStyle(color: Colors.black54)),
                         onChanged: (String key) {
                           inputKey = key;
@@ -180,9 +188,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextField(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: 'Enter a Operation Values',
+                          hintText: 'Enter Values',
                             hintStyle:
-                            TextStyle(fontSize: 15.0, color: Colors.grey[10]),
+                            TextStyle(fontSize: 13.0, color: Colors.grey[10]),
                             labelStyle: TextStyle(color: Colors.black54),
                         ),
                         onChanged: (String value) {
@@ -198,8 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         dataKeyValues
                             .addEntries({"$inputKey": "$inputValue"}.entries);
-                        getKeysAndValuesUsingForEach(dataKeyValues);
-                        print(dataKeyValues);
+                        print("dataKeyValues : $dataKeyValues");
                       });
                       Navigator.of(context).pop();
                     },
@@ -228,10 +235,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Expanded(child: Text("${listDataKey[index]}")),
+                        Expanded(child: Text("${dataKeyValues.keys.elementAt(index)}")),
                         Expanded(
                           child: TextFormField(
-                            initialValue: "${listDataValue[index]}",
+                            onChanged: (String text){
+                              dataKeyValues[dataKeyValues.keys.elementAt(index)] = text;
+                            },
+                            initialValue: "${dataKeyValues.values.elementAt(index)}",
                           ),
                         ),
                       ],

@@ -2,7 +2,8 @@
   "project_info": {
     "project_number": "209912157590",
     "project_id": "assistant-project-f4d87",
-    "storage_bucket": "assistant-project-f4d87.appspot.com"
+    "storage_bucket": "assistant-project-f4d87.appspot.com",
+    "firebase_url" : "https://assistant-project-f4d87-default-rtdb.asia-southeast1.firebasedatabase.app"
   },
   "client": [
     {

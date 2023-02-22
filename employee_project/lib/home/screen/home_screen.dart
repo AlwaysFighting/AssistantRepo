@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String inputKey = "";
-  //String inputValue = "";
+  String inputValue = "";
 
   List<String> keysList = [];
   List<String> valuesList = [];
@@ -119,9 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final dailyDataRef = database.child(
-        '/${now.year}년-${now.month}월-${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시-${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
+        '/${now.year}년 ${now.month}월 ${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시 ${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
 
     // 데이터 업데이트하기
     void _setData(Map map) {
@@ -152,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _setData(dataKeyValues);
               },
               icon: const Text(
-                "SAVE",
+                "저장",
                 style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w700),
               ),
             ),
@@ -172,13 +171,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 80,
                   child: Column(
                     children: [
-                      SizedBox(height: 15),
+                      SizedBox(height: 17),
                       TextField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Enter Name',
-                            hintStyle:
-                                TextStyle(fontSize: 13.0, color: Colors.grey[10]),
+                            hintText: '기기 이름 작성하기',
+                            hintStyle: TextStyle(
+                                fontSize: 13.0, color: Colors.grey[10]),
                             labelStyle: TextStyle(color: Colors.black54)),
                         onChanged: (String key) {
                           inputKey = key;
@@ -191,13 +190,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextButton(
                     onPressed: () {
                       setState(() {
-                        dataKeyValues
-                            .addEntries({"$inputKey": "0"}.entries);
+                        dataKeyValues.addEntries({"$inputKey": "0"}.entries);
                         print("dataKeyValues : $dataKeyValues");
                       });
                       Navigator.of(context).pop();
                     },
-                    child: Text("ADD"),
+                    child: Text("업로드"),
                   )
                 ],
               );
@@ -207,49 +205,74 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.teal,
         child: Icon(Icons.add),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 50, 10, 20),
-        child: ListView.builder(
-          itemCount: dataKeyValues.length,
-          padding: const EdgeInsets.all(8),
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              elevation: 2,
-              margin: EdgeInsets.all(5.0),
-              child: Container(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                  children: <Widget>[
-                    Row(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 30, 10, 0),
+            child: DropdownButton<String>(
+              value: dataListName,
+              icon: const Icon(Icons.arrow_drop_down),
+              elevation: 1,
+              style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700),
+              onChanged: (String? value) {
+                setState(() {
+                  dataListName = value!;
+                  dataKeyValues.clear(); // 저장 배열 공간 초기화
+                  _activateListener();
+                });
+              },
+              items: operationNameLists
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: dataKeyValues.length,
+              padding: const EdgeInsets.all(8),
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  elevation: 2,
+                  margin: EdgeInsets.all(5.0),
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
+                    child: Column(
                       children: <Widget>[
-                        Expanded(child: Text("${dataKeyValues.keys.elementAt(index)}")),
-                        Expanded(
-                          child: TextFormField(
-                            onChanged: (String text){
-                              dataKeyValues[dataKeyValues.keys.elementAt(index)] = text;
-                            },
-                            initialValue: "${dataKeyValues.values.elementAt(index)}",
-                          ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: Text(
+                                    "${dataKeyValues.keys.elementAt(index)}")),
+                            Expanded(
+                              child: TextFormField(
+                                onChanged: (String text) {
+                                  dataKeyValues[dataKeyValues.keys
+                                      .elementAt(index)] = text;
+                                },
+                                initialValue:
+                                    "${dataKeyValues.values.elementAt(index)}",
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ), drawer:  DrawerScreen(
-      onRegionTap: (String region) {
-        setState(() {
-          dataListName = region;
-          dataKeyValues.clear(); // 저장 배열 공간 초기화
-          _activateListener();
-        });
-        Navigator.of(context).pop();
-      },
-      selectedRegion: dataListName,
-    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -257,9 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
 Container buildButton(BuildContext context, String text) {
   return Container(
     decoration: BoxDecoration(
-      color: Theme
-          .of(context)
-          .primaryColor,
+      color: Theme.of(context).primaryColor,
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(

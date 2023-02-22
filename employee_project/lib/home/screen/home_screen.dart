@@ -221,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(22, 30, 22, 0),
+            padding: const EdgeInsets.fromLTRB(22, 50, 22, 0),
             child: DropdownButton<String>(
               isExpanded: true,
               value: dataListName,

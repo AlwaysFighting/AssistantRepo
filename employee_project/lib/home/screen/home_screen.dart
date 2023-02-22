@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../component/drawer_screen.dart';
 import '../../const/operationNameLists.dart';
 import '../../utils/data_utils.dart';
 
@@ -22,21 +21,21 @@ class _HomeScreenState extends State<HomeScreen> {
   String inputKey = "";
   String inputValue = "";
 
-  List<String> keysList = [];
-  List<String> valuesList = [];
-
   Map<int, String> listDataKey = {};
   Map<int, String> listDataValue = {};
 
   Map<dynamic, dynamic> dataKeyValues = {};
 
-  String dataListName = operationNameLists[0];
   int valueCount = 0;
 
   final database = FirebaseDatabase.instance.reference();
   DateTime now = DateTime.now().toUtc();
 
   late StreamSubscription _dailySpecialStream;
+  late StreamSubscription _itemListStream;
+
+  List<String?> operationNameLists = [];
+  String dataListName = "서울";
 
   @override
   void initState() {
@@ -75,7 +74,19 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         valueCount = dataMap.length;
         getKeysAndValuesUsingForEach(dataMap);
-        print(dataMap);
+        print("dataMap : $dataMap");
+      });
+    });
+
+    _itemListStream = database
+        .child('itemList')
+        .onValue
+        .listen((event) {
+      final listItemMap =
+      List<String?>.from(event.snapshot.value as dynamic);
+      setState(() {
+        operationNameLists = listItemMap;
+        print("listItemMap : $listItemMap");
       });
     });
   }
@@ -88,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void deactivate() {
     _dailySpecialStream.cancel();
+    _itemListStream.cancel();
     super.deactivate();
   }
 
@@ -206,17 +218,22 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Icon(Icons.add),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 30, 10, 0),
+            padding: const EdgeInsets.fromLTRB(22, 30, 22, 0),
             child: DropdownButton<String>(
+              isExpanded: true,
               value: dataListName,
               icon: const Icon(Icons.arrow_drop_down),
+              menuMaxHeight:400,
               elevation: 1,
               style: const TextStyle(
                   color: Colors.black54,
                   fontSize: 18,
-                  fontWeight: FontWeight.w700),
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'NotoSans',
+              ),
               onChanged: (String? value) {
                 setState(() {
                   dataListName = value!;
@@ -225,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
               items: operationNameLists
-                  .map<DropdownMenuItem<String>>((String value) {
+                  .map<DropdownMenuItem<String>>((dynamic value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),

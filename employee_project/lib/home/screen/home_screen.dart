@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String inputKey = "";
-  String inputValue = "";
+  //String inputValue = "";
 
   List<String> keysList = [];
   List<String> valuesList = [];
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _activateListener() {
     _dailySpecialStream = database
-        .child('${now.year}년-${now.month}월-${now.day}일/$dataListName/')
+        .child('${now.year}년 ${now.month}월 ${now.day}일/$dataListName/')
         .onChildAdded
         .listen((event) {
       final dataMap =
@@ -169,10 +169,10 @@ class _HomeScreenState extends State<HomeScreen> {
               return AlertDialog(
                 title: Text("기능 추가하기"),
                 content: Container(
-                  height: 150,
+                  height: 80,
                   child: Column(
                     children: [
-                      SizedBox(height: 17),
+                      SizedBox(height: 15),
                       TextField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(),
@@ -184,19 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           inputKey = key;
                         },
                       ),
-                      SizedBox(height: 5),
-                      TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Enter Values',
-                            hintStyle:
-                            TextStyle(fontSize: 13.0, color: Colors.grey[10]),
-                            labelStyle: TextStyle(color: Colors.black54),
-                        ),
-                        onChanged: (String value) {
-                          inputValue = value;
-                        },
-                      ),
                     ],
                   ),
                 ),
@@ -205,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       setState(() {
                         dataKeyValues
-                            .addEntries({"$inputKey": "$inputValue"}.entries);
+                            .addEntries({"$inputKey": "0"}.entries);
                         print("dataKeyValues : $dataKeyValues");
                       });
                       Navigator.of(context).pop();

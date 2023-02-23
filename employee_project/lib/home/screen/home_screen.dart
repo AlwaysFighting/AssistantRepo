@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../utils/data_utils.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   final String? title;
@@ -36,6 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String?> operationNameLists = [];
   String dataListName = "서울";
 
+  // DateFormat 년,월,일 형식 지정하기
+  DateFormat dateFormat = DateFormat("yyyy년 MM월 dd일");
+  // DateFormat 시,분,초 지정하기
+  DateFormat dateTimeFormat = DateFormat("kk시 mm분 ss초 a");
+
   @override
   void initState() {
     super.initState();
@@ -63,15 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  /// Create a query with limit and anchor it to the end of the window.
-  Query limitToLast(int limit) {
-    assert(!_parameters.containsKey('limitToLast'));
-    return _copyWithParameters(<String, dynamic>{'limitToLast': limit});
-  }
-
   void _activateListener() {
     _dailySpecialStream = database
-        .child('${now.year}년 ${now.month}월 ${now.day}일/$dataListName/')
+        .child('${dateFormat.format(DateTime.now())}/$dataListName/')
         .onChildAdded
         .listen((event) {
       final dataMap =
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final dailyDataRef = database.child(
-        '/${now.year}년 ${now.month}월 ${now.day}일/$dataListName/${'${DataUtils.getTimeFormat(DateTime.now().hour)}시 ${DataUtils.getTimeFormat(DateTime.now().minute)}분'}');
+        '/${dateFormat.format(DateTime.now())}/$dataListName/${dateTimeFormat.format(DateTime.now())}');
 
     // 데이터 업데이트하기
     void _setData(Map map) {

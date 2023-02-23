@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../utils/data_utils.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -114,9 +113,10 @@ class _HomeScreenState extends State<HomeScreen> {
         content: Text(
       " 🎉 SUCCESS UPLOAD! 🎉",
       style: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600
-        ),
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        fontFamily: "NotoSans",
+      ),
     ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -125,12 +125,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _errorShowSnackBar(Object error) {
     final snackBar = SnackBar(
         content: Text(
-          " 😵 $error 😵",
-          style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w600
-          ),
-        ));
+      " 😵 $error 😵",
+      style: TextStyle(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        fontFamily: "NotoSans",
+      ),
+    ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -169,7 +170,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               icon: const Text(
                 "저장",
-                style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "NotoSans",
+                ),
               ),
             ),
             width: 80,
@@ -194,8 +199,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             border: OutlineInputBorder(),
                             hintText: '기기 이름 작성하기',
                             hintStyle: TextStyle(
-                                fontSize: 13.0, color: Colors.grey[10]),
-                            labelStyle: TextStyle(color: Colors.black54)),
+                              fontSize: 13.0,
+                              color: Colors.grey[10],
+                              fontFamily: "NotoSans",
+                            ),
+                            labelStyle: TextStyle(
+                              color: Colors.black54,
+                              fontFamily: "NotoSans",
+                            )),
                         onChanged: (String key) {
                           inputKey = key;
                         },
@@ -322,6 +333,7 @@ Container buildButton(BuildContext context, String text) {
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
+            fontFamily: "NotoSans",
           ),
         ),
       ),

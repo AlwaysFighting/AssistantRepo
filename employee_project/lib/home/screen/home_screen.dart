@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../const/operationNameLists.dart';
 import '../../utils/data_utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -62,6 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
         dataKeyValues.addEntries({"$key": "$value"}.entries);
       }
     });
+  }
+
+  /// Create a query with limit and anchor it to the end of the window.
+  Query limitToLast(int limit) {
+    assert(!_parameters.containsKey('limitToLast'));
+    return _copyWithParameters(<String, dynamic>{'limitToLast': limit});
   }
 
   void _activateListener() {

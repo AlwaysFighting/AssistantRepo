@@ -37,9 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String dataListName = "서울";
 
   // DateFormat 년,월,일 형식 지정하기
-  DateFormat dateFormat = DateFormat("yyyy년 MM월 dd일");
+  DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   // DateFormat 시,분,초 지정하기
-  DateFormat dateTimeFormat = DateFormat("kk시 mm분 ss초 a");
+  DateFormat dateTimeFormat = DateFormat("kk:mm");
 
   @override
   void initState() {

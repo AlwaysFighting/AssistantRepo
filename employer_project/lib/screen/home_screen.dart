@@ -16,6 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late DatabaseReference dbRef;
   late StreamSubscription _dailySpecialStream;
 
+  final database = FirebaseDatabase.instance.reference();
+  DateTime now = DateTime.now().toUtc();
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _activateListener() {
-   dbRef = FirebaseDatabase.instance.ref().child('Employee');
+   dbRef = FirebaseDatabase.instance.ref().child('Employee/');
    print("dbRef : $dbRef");
   }
 

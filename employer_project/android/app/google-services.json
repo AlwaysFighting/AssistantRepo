@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "209912157590",
+    "firebase_url": "https://assistant-project-f4d87-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "assistant-project-f4d87",
+    "storage_bucket": "assistant-project-f4d87.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209912157590:android:44d6961ea655cad2d839b7",
+        "android_client_info": {
+          "package_name": "com.example.employee_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlFqvS2RpQiHhowRMichFXTAl4W03KZ24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209912157590:android:32bde7bbe6648f23d839b7",
+        "android_client_info": {
+          "package_name": "com.example.employer_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlFqvS2RpQiHhowRMichFXTAl4W03KZ24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

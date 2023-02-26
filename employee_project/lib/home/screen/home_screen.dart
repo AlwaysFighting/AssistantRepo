@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _activateListener() {
     _dailySpecialStream = database
-        .child('${dateFormat.format(DateTime.now())}/$dataListName/')
+        .child('Employee/${dateFormat.format(DateTime.now())}/$dataListName/')
         .onChildAdded
         .listen((event) {
       final dataMap =
@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final dailyDataRef = database.child(
-        '/${dateFormat.format(DateTime.now())}/$dataListName/${dateTimeFormat.format(DateTime.now())}');
+        '/Employee/${dateFormat.format(DateTime.now())}/$dataListName/${dateTimeFormat.format(DateTime.now())}');
 
     // 데이터 업데이트하기
     void _setData(Map map) {

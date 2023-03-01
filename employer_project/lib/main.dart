@@ -1,4 +1,4 @@
-import 'package:employer_project/screen/dashboard_screen.dart';
+import 'package:employer_project/screen/data_detail_screen.dart';
 import 'package:employer_project/screen/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ Future<void> main() async{
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DashBoardScreen(),
+      home: HomeScreen(),
     ),
   );
 }

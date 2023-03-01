@@ -8,91 +8,72 @@ class DashBoardScreen extends StatefulWidget {
 }
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
-  bool isExpaneded = false;
-  int _selectedIndex = 0;
-  double groupAligment = -1.0;
-  NavigationRailLabelType labelType = NavigationRailLabelType.selected;
+
+  static const textStyle = TextStyle(
+    color: Colors.teal,
+    fontWeight: FontWeight.w700,
+    fontSize: 13,
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[80],
-      body: SafeArea(
-        child: Row(
-          children: [
-            NavigationRail(
-                selectedIndex: _selectedIndex,
-                groupAlignment: groupAligment,
-                extended: isExpaneded,
-                labelType: labelType,
-                unselectedIconTheme: IconThemeData(color: Colors.black38),
-                selectedIconTheme: IconThemeData(color: Colors.teal),
-                onDestinationSelected: (int index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                destinations: [
-                  NavigationRailDestination(
-                      icon: Icon(Icons.home), label: Text("홈")),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.bar_chart), label: Text("데이터 분석")),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.settings), label: Text("설정")),
-                ],
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 80.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    DataTable(
-                      headingRowColor: MaterialStateProperty.resolveWith(
-                          (states) => Colors.grey.shade200),
-                      columns: [
-                        DataColumn(label: Text("ID")),
-                        DataColumn(label: Text("기기 이름")),
-                        DataColumn(label: Text("업로드 최종 날짜")),
-                        DataColumn(label: Text("업로드 최종 시간")),
-                        DataColumn(label: Text("기능1")),
-                        DataColumn(label: Text("기능2")),
-                        DataColumn(label: Text("기능3")),
-                        DataColumn(label: Text("기능4")),
-                        DataColumn(label: Text("기능5")),
-                      ],
-                      rows: [
-                        DataRow(cells: [
-                          DataCell(Text("0")),
-                          DataCell(Text("AA10001")),
-                          DataCell(Text("2022-02-27")),
-                          DataCell(Text("02:50")),
-                          DataCell(Text("count : 50")),
-                          DataCell(Text("temperture : 100")),
-                          DataCell(Text("Null")),
-                          DataCell(Text("Null")),
-                          DataCell(Text("Null")),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(Text("1")),
-                          DataCell(Text("AA10002")),
-                          DataCell(Text("2022-02-27")),
-                          DataCell(Text("03:02")),
-                          DataCell(Text("count : 80")),
-                          DataCell(Text("temperture : 40")),
-                          DataCell(Text("rotation : 30")),
-                          DataCell(Text("Null")),
-                          DataCell(Text("Null")),
-                        ]),
-                      ],
+      backgroundColor: Colors.white10,
+      body: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0, vertical: 80.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DataTable(
+                    headingRowColor: MaterialStateProperty.all(Colors.grey[100]),
+                    columnSpacing: 40,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
+                    columns: [
+                      DataColumn(label: Text("ID")),
+                      DataColumn(label: Text("기기 이름")),
+                      DataColumn(label: Text("업로드 최종 날짜")),
+                      DataColumn(label: Text("업로드 최종 시간")),
+                      DataColumn(label: Text("기능1")),
+                      DataColumn(label: Text("기능2")),
+                      DataColumn(label: Text("기능3")),
+                    ],
+                    rows: [
+                      DataRow(cells: [
+                        DataCell(Text("0")),
+                        DataCell(Text("AA10001")),
+                        DataCell(Text("2022-02-27")),
+                        DataCell(Text("02:50")),
+                        DataCell(Text("count : 50")),
+                        DataCell(Text("temperture : 100")),
+                        DataCell(Text("Null")),
+                      ]),
+                      DataRow(cells: [
+                        DataCell(Text("1")),
+                        DataCell(Text("AA10002")),
+                        DataCell(Text("2022-02-27")),
+                        DataCell(Text("03:02")),
+                        DataCell(Text("count : 80")),
+                        DataCell(Text("temperture : 40")),
+                        DataCell(Text("rotation : 30")),
+                      ]),
+                    ],
+                  ),
+                ],
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 class HomeScreen extends StatefulWidget {
   final String? title;
 
-  HomeScreen({
+  const HomeScreen({
     Key? key,
     this.title,
   }) : super(key: key);
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late StreamSubscription _itemListStream;
 
   List<String?> operationNameLists = [];
-  String dataListName = "서울";
+  String dataListName = "AA10001";
 
   // DateFormat 년,월,일 형식 지정하기
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");

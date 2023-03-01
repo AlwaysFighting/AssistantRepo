@@ -9,6 +9,9 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
   bool isExpaneded = false;
+  int _selectedIndex = 0;
+  double groupAligment = -1.0;
+  NavigationRailLabelType labelType = NavigationRailLabelType.selected;
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +21,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: Row(
           children: [
             NavigationRail(
+                selectedIndex: _selectedIndex,
+                groupAlignment: groupAligment,
                 extended: isExpaneded,
+                labelType: labelType,
                 unselectedIconTheme: IconThemeData(color: Colors.black38),
                 selectedIconTheme: IconThemeData(color: Colors.teal),
+                onDestinationSelected: (int index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
                 destinations: [
                   NavigationRailDestination(
                       icon: Icon(Icons.home), label: Text("홈")),
@@ -29,7 +40,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   NavigationRailDestination(
                       icon: Icon(Icons.settings), label: Text("설정")),
                 ],
-                selectedIndex: 0),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(

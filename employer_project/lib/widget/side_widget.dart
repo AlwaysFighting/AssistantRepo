@@ -1,33 +1,60 @@
+import 'package:employer_project/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
-class SideMenuWidget extends StatelessWidget {
-  SideMenuWidget({
+class SideMenuScreen extends StatelessWidget {
+  const SideMenuScreen({
     super.key,
   });
 
-  final selectedTextStyle = TextStyle(
-    color: Colors.teal,
-    fontWeight: FontWeight.w700,
-    fontSize: 13,
-  );
-
   @override
   Widget build(BuildContext context) {
+
+    const textStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+      fontSize: 13,
+    );
+
     return Drawer(
-      child: Column(
+      backgroundColor: Colors.blueGrey,
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: [
           ListTile(
-            onTap: (){
-
+            onTap: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation) {
+                    return const HomeScreen(navPage: 0);
+                  },
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
             },
-            leading: Icon(Icons.home_filled,),
-            title: Text("홈"),
-            selectedColor: Colors.teal,
+            leading: const Icon(Icons.home_filled, color: Colors.white,),
+            title: const Text("홈", style: textStyle),
           ),
           ListTile(
-            onTap: (){},
-            leading: Icon(Icons.bar_chart),
-            title: Text("데이터 분석"),
+            onTap: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation) {
+                    return const HomeScreen(navPage: 1);
+                  },
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            },
+            leading: const Icon(Icons.bar_chart, color: Colors.white),
+            title: const Text("데이터 분석", style: textStyle),
           ),
         ],
       ),

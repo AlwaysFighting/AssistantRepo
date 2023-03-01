@@ -58,7 +58,7 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
 
   void _activateListener() {
     _dailySpecialStream = database
-        .child('Employee/${dateFormat.format(DateTime.now())}/$dataListName/')
+        .child('Employee/${dateFormat.format(DateTime.now().subtract(Duration(days: 1)))}/$dataListName/')
         .onChildAdded
         .listen((event) {
       final dataMap =
@@ -145,7 +145,7 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+        backgroundColor: Colors.white,
         title: Text(dataListName),
         actions: [
           SizedBox(
@@ -157,8 +157,9 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
               icon: const Text(
                 "저장",
                 style: TextStyle(
+                  color: Colors.blueGrey,
                   fontSize: 15.0,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   fontFamily: "NotoSans",
                 ),
               ),
@@ -214,7 +215,7 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
             },
           );
         },
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blueGrey,
         child: const Icon(Icons.add),
       ),
       body: Padding(

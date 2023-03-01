@@ -9,12 +9,6 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
 
-  static const textStyle = TextStyle(
-    color: Colors.teal,
-    fontWeight: FontWeight.w700,
-    fontSize: 13,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,15 +52,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         DataCell(Text("temperture : 100")),
                         DataCell(Text("Null")),
                       ]),
-                      DataRow(cells: [
-                        DataCell(Text("1")),
-                        DataCell(Text("AA10002")),
-                        DataCell(Text("2022-02-27")),
-                        DataCell(Text("03:02")),
-                        DataCell(Text("count : 80")),
-                        DataCell(Text("temperture : 40")),
-                        DataCell(Text("rotation : 30")),
-                      ]),
+                      DataRow(
+                        cells: [
+                          DataCell(Text("1")),
+                          DataCell(Text("AA10002")),
+                          DataCell(Text("2022-02-27")),
+                          DataCell(Text("03:02")),
+                          DataCell(Text("count : 80")),
+                          DataCell(Text("temperture : 40")),
+                          DataCell(Text("rotation : 30")),
+                        ],
+                      ),
                     ],
                   ),
                 ],

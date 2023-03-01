@@ -47,18 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _activateListener();
   }
 
-  void getKeysFromMap(Map map) {
-    map.forEach((key, value) {
-      for (int i = 0; i < valueCount; i++) {}
-    });
-  }
-
-  void getValuesFromMap(Map map) {
-    map.values.forEach((value) {
-      print(value);
-    });
-  }
-
   // 맵의 key, value 불러오기
   void getKeysAndValuesUsingForEach(Map map) {
     map.forEach((key, value) {
@@ -78,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         valueCount = dataMap.length;
         getKeysAndValuesUsingForEach(dataMap);
-        print("dataMap : $dataMap");
+        // print("dataMap : $dataMap");
       });
     });
 
@@ -90,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
       List<String?>.from(event.snapshot.value as dynamic);
       setState(() {
         operationNameLists = listItemMap;
-        print("listItemMap : $listItemMap");
+        // print("listItemMap : $listItemMap");
       });
     });
   }
@@ -109,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 데이터 업데이트 성공시 스낵바 띄우기
   void _showSnackBar() {
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
         content: Text(
       " 🎉 SUCCESS UPLOAD! 🎉",
       style: TextStyle(
@@ -126,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final snackBar = SnackBar(
         content: Text(
       " 😵 $error 😵",
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 17,
         fontWeight: FontWeight.w600,
         fontFamily: "NotoSans",
@@ -142,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 데이터 업데이트하기
     void _setData(Map map) {
-      print(map);
       map.forEach((key, value) async {
         for (int i = 0; i < map.length; i++) {
           try {
@@ -164,6 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(dataListName),
         actions: [
           SizedBox(
+            width: 80,
             child: IconButton(
               onPressed: () async {
                 _setData(dataKeyValues);
@@ -177,7 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            width: 80,
           ),
         ],
       ),
@@ -188,22 +175,22 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("기능 추가하기"),
-                content: Container(
+                title: const Text("기능 추가하기"),
+                content: SizedBox(
                   height: 80,
                   child: Column(
                     children: [
-                      SizedBox(height: 17),
+                      const SizedBox(height: 17),
                       TextField(
                         decoration: InputDecoration(
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             hintText: '기기 이름 작성하기',
                             hintStyle: TextStyle(
                               fontSize: 13.0,
                               color: Colors.grey[10],
                               fontFamily: "NotoSans",
                             ),
-                            labelStyle: TextStyle(
+                            labelStyle: const TextStyle(
                               color: Colors.black54,
                               fontFamily: "NotoSans",
                             )),
@@ -219,7 +206,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       setState(() {
                         dataKeyValues.addEntries({"$inputKey": "0"}.entries);
-                        print("dataKeyValues : $dataKeyValues");
                       });
                       Navigator.of(context).pop();
                     },
@@ -231,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
         backgroundColor: Colors.teal,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

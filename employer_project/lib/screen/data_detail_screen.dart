@@ -56,19 +56,7 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
     });
   }
 
-  void _activateListener() {
-    _dailySpecialStream = database
-        .child('Employee/${dateFormat.format(DateTime.now().subtract(Duration(days: 1)))}/$dataListName/')
-        .onChildAdded
-        .listen((event) {
-      final dataMap =
-      Map<dynamic, dynamic>.from(event.snapshot.value as dynamic);
-      setState(() {
-        valueCount = dataMap.length;
-        getKeysAndValuesUsingForEach(dataMap);
-      });
-    });
-
+  void _activateListener() async {
     _itemListStream = database
         .child('itemList')
         .onValue
@@ -79,6 +67,16 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
         operationNameLists = listItemMap;
       });
     });
+
+    final itemRef = FirebaseDatabase.instance.ref();
+
+    final snapshot = await itemRef.child('itemListValues/$dataListName').get();
+    if(snapshot.exists) {
+      getKeysAndValuesUsingForEach(snapshot.value as Map);
+      print("dataKeyValues: ${dataKeyValues.keys}");
+    } else {
+      print("No data..");
+    }
   }
 
   @override
@@ -88,7 +86,6 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
 
   @override
   void deactivate() {
-    _dailySpecialStream.cancel();
     _itemListStream.cancel();
     super.deactivate();
   }
@@ -123,8 +120,10 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final dailyDataRef = database.child(
-        '/Employee/${dateFormat.format(DateTime.now())}/$dataListName/${dateTimeFormat.format(DateTime.now())}');
+        '/Item-TimeStamp/$dataListName/${dateFormat.format(DateTime.now())}/${dateTimeFormat.format(DateTime.now())}');
+    final addDataListRef = database.child('itemListValues/$dataListName/');
 
     // 데이터 업데이트하기
     void _setData(Map map) {
@@ -132,6 +131,9 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
         for (int i = 0; i < map.length; i++) {
           try {
             await dailyDataRef.update({
+              '$key': '$value',
+            });
+            await addDataListRef.update({
               '$key': '$value',
             });
           } catch (e) {
@@ -202,11 +204,14 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
                 ),
                 actions: <Widget>[
                   TextButton(
-                    onPressed: () {
-                      setState(() {
-                        dataKeyValues.addEntries({"$inputKey": "0"}.entries);
-                      });
+                    onPressed: () async {
                       Navigator.of(context).pop();
+                      await addDataListRef.update({
+                        inputKey : "0"
+                      });
+                      setState(() {
+                        dataKeyValues.addEntries({inputKey: "0"}.entries);
+                      });
                     },
                     child: const Text("업로드"),
                   )
@@ -219,7 +224,7 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
         child: const Icon(Icons.add),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 300.0),
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 100.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

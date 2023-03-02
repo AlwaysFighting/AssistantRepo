@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _activateListener() {
     _dailySpecialStream = database
-        .child('Employee/${dateFormat.format(DateTime.now().subtract(Duration(days: 1)))}/$dataListName/')
+        .child('Employee/${dateFormat.format(DateTime.now())}/$dataListName/')
         .onChildAdded
         .listen((event) {
       final dataMap =

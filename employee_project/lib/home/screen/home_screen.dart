@@ -56,19 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _activateListener() {
-    _dailySpecialStream = database
-        .child('Employee/${dateFormat.format(DateTime.now())}/$dataListName/')
-        .onChildAdded
-        .listen((event) {
-      final dataMap =
-          Map<dynamic, dynamic>.from(event.snapshot.value as dynamic);
-      setState(() {
-        valueCount = dataMap.length;
-        getKeysAndValuesUsingForEach(dataMap);
-        // print("dataMap : $dataMap");
-      });
-    });
+  void _activateListener() async {
+
+    final itemRef = FirebaseDatabase.instance.ref();
+    final snapshot = await itemRef.child('itemListValues/$dataListName').get();
 
     _itemListStream = database
         .child('itemList')
@@ -78,9 +69,16 @@ class _HomeScreenState extends State<HomeScreen> {
       List<String?>.from(event.snapshot.value as dynamic);
       setState(() {
         operationNameLists = listItemMap;
-        // print("listItemMap : $listItemMap");
       });
     });
+
+    if(snapshot.exists) {
+      getKeysAndValuesUsingForEach(snapshot.value as Map);
+      print("dataKeyValues: ${dataKeyValues.keys}");
+      print("dataKeyValues: ${dataKeyValues.values}");
+    } else {
+      print("No data..");
+    }
   }
 
   @override
@@ -90,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void deactivate() {
-    _dailySpecialStream.cancel();
     _itemListStream.cancel();
     super.deactivate();
   }
@@ -99,13 +96,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showSnackBar() {
     const snackBar = SnackBar(
         content: Text(
-      " 🎉 SUCCESS UPLOAD! 🎉",
-      style: TextStyle(
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-        fontFamily: "NotoSans",
-      ),
-    ));
+          " 🎉 SUCCESS UPLOAD! 🎉",
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            fontFamily: "NotoSans",
+          ),
+        ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -113,20 +110,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void _errorShowSnackBar(Object error) {
     final snackBar = SnackBar(
         content: Text(
-      " 😵 $error 😵",
-      style: const TextStyle(
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-        fontFamily: "NotoSans",
-      ),
-    ));
+          " 😵 $error 😵",
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            fontFamily: "NotoSans",
+          ),
+        ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
   Widget build(BuildContext context) {
+
     final dailyDataRef = database.child(
-        '/Employee/${dateFormat.format(DateTime.now())}/$dataListName/${dateTimeFormat.format(DateTime.now())}');
+        '/Item-TimeStamp/$dataListName/${dateFormat.format(DateTime.now())}/${dateTimeFormat.format(DateTime.now())}');
+    final addDataListRef = database.child('itemListValues/$dataListName/');
 
     // 데이터 업데이트하기
     void _setData(Map map) {
@@ -134,6 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
         for (int i = 0; i < map.length; i++) {
           try {
             await dailyDataRef.update({
+              '$key': '$value',
+            });
+            await addDataListRef.update({
               '$key': '$value',
             });
           } catch (e) {
@@ -147,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+        backgroundColor: Colors.teal,
         title: Text(dataListName),
         actions: [
           SizedBox(
@@ -159,8 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Text(
                 "저장",
                 style: TextStyle(
+                  color: Colors.white,
                   fontSize: 15.0,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   fontFamily: "NotoSans",
                 ),
               ),
@@ -203,13 +206,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 actions: <Widget>[
                   TextButton(
-                    onPressed: () {
-                      setState(() {
-                        dataKeyValues.addEntries({"$inputKey": "0"}.entries);
-                      });
+                    onPressed: () async {
                       Navigator.of(context).pop();
+                      await addDataListRef.update({
+                        inputKey : "0"
+                      });
+                      setState(() {
+                        dataKeyValues.addEntries({inputKey: "0"}.entries);
+                      });
                     },
-                    child: Text("업로드"),
+                    child: const Text("저장"),
                   )
                 ],
               );
@@ -219,78 +225,84 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.teal,
         child: const Icon(Icons.add),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(22, 50, 22, 0),
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: dataListName,
-              icon: const Icon(Icons.arrow_drop_down),
-              menuMaxHeight:400,
-              elevation: 1,
-              style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'NotoSans',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 50, 22, 0),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  value: dataListName,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  menuMaxHeight:400,
+                  elevation: 1,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'NotoSans',
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      dataListName = value!;
+                      dataKeyValues.clear(); // 저장 배열 공간 초기화
+                      _activateListener();
+                    });
+                  },
+                  items: operationNameLists
+                      .map<DropdownMenuItem<String>>((dynamic value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
               ),
-              onChanged: (String? value) {
-                setState(() {
-                  dataListName = value!;
-                  dataKeyValues.clear(); // 저장 배열 공간 초기화
-                  _activateListener();
-                });
-              },
-              items: operationNameLists
-                  .map<DropdownMenuItem<String>>((dynamic value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: dataKeyValues.length,
-              padding: const EdgeInsets.all(8),
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  elevation: 2,
-                  margin: EdgeInsets.all(5.0),
-                  child: Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemCount: dataKeyValues.length,
+                  padding: const EdgeInsets.all(8),
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.all(5.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
                           children: <Widget>[
-                            Expanded(
-                                child: Text(
-                                    "${dataKeyValues.keys.elementAt(index)}")),
-                            Expanded(
-                              child: TextFormField(
-                                onChanged: (String text) {
-                                  dataKeyValues[dataKeyValues.keys
-                                      .elementAt(index)] = text;
-                                },
-                                initialValue:
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                    child: Text(
+                                        "${dataKeyValues.keys.elementAt(index)}")),
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue:
                                     "${dataKeyValues.values.elementAt(index)}",
-                              ),
+                                    onChanged: (String text) {
+                                      dataKeyValues[dataKeyValues.keys
+                                          .elementAt(index)] = text;
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

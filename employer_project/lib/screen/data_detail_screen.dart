@@ -57,6 +57,10 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
   }
 
   void _activateListener() async {
+
+    final itemRef = FirebaseDatabase.instance.ref();
+    final snapshot = await itemRef.child('itemListValues/$dataListName').get();
+
     _itemListStream = database
         .child('itemList')
         .onValue
@@ -68,12 +72,10 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
       });
     });
 
-    final itemRef = FirebaseDatabase.instance.ref();
-
-    final snapshot = await itemRef.child('itemListValues/$dataListName').get();
     if(snapshot.exists) {
       getKeysAndValuesUsingForEach(snapshot.value as Map);
       print("dataKeyValues: ${dataKeyValues.keys}");
+      print("dataKeyValues: ${dataKeyValues.values}");
     } else {
       print("No data..");
     }
@@ -213,7 +215,7 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
                         dataKeyValues.addEntries({inputKey: "0"}.entries);
                       });
                     },
-                    child: const Text("업로드"),
+                    child: const Text("저장"),
                   )
                 ],
               );
@@ -223,80 +225,83 @@ class _DataDetailScreenState extends State<DataDetailScreen> {
         backgroundColor: Colors.blueGrey,
         child: const Icon(Icons.add),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 100.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 50, 22, 0),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                value: dataListName,
-                icon: const Icon(Icons.arrow_drop_down),
-                menuMaxHeight:400,
-                elevation: 1,
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'NotoSans',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 100.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 50, 22, 0),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  value: dataListName,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  menuMaxHeight:400,
+                  elevation: 1,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'NotoSans',
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      dataListName = value!;
+                      dataKeyValues.clear(); // 저장 배열 공간 초기화
+                      _activateListener();
+                    });
+                  },
+                  items: operationNameLists
+                      .map<DropdownMenuItem<String>>((dynamic value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 ),
-                onChanged: (String? value) {
-                  setState(() {
-                    dataListName = value!;
-                    dataKeyValues.clear(); // 저장 배열 공간 초기화
-                    _activateListener();
-                  });
-                },
-                items: operationNameLists
-                    .map<DropdownMenuItem<String>>((dynamic value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: dataKeyValues.length,
-                padding: const EdgeInsets.all(8),
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.all(5.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                  child: Text(
-                                      "${dataKeyValues.keys.elementAt(index)}")),
-                              Expanded(
-                                child: TextFormField(
-                                  onChanged: (String text) {
-                                    dataKeyValues[dataKeyValues.keys
-                                        .elementAt(index)] = text;
-                                  },
-                                  initialValue:
-                                  "${dataKeyValues.values.elementAt(index)}",
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemCount: dataKeyValues.length,
+                  padding: const EdgeInsets.all(8),
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.all(5.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                    child: Text(
+                                        "${dataKeyValues.keys.elementAt(index)}")),
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue:
+                                    "${dataKeyValues.values.elementAt(index)}",
+                                    onChanged: (String text) {
+                                      dataKeyValues[dataKeyValues.keys
+                                          .elementAt(index)] = text;
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
